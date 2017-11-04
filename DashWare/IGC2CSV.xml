@@ -6,7 +6,7 @@
   <DataValueSeparators>,</DataValueSeparators>
   <UseEuroDecimalFormat>False</UseEuroDecimalFormat>
   <FileLineMatchers>
-    <FileLineMatcher dataLineIndex="0" matchText="Datetime (UTC),Elapsed Time,Latitude (Degrees),Longitude (Degrees),Altitude GPS,Distance Delta" matchMode="Contains" ignoreCase="False" />
+    <FileLineMatcher dataLineIndex="0" matchText="Datetime (UTC),Elapsed Time,Latitude (Degrees),Longitude (Degrees),Altitude GPS,Altitude Pressure,Distance Delta" matchMode="Contains" ignoreCase="False" />
   </FileLineMatchers>
   <Calculators>
     <LinearInterpolator filterValues="True" standardDevCeiling="5">
@@ -27,7 +27,7 @@
     </LinearInterpolator>
     <LinearInterpolator filterValues="False" standardDevCeiling="5">
       <InputColumns>
-        <InputColumn>Altitude GPS</InputColumn>
+        <InputColumn>Altitude Pressure</InputColumn>
       </InputColumns>
       <OutputColumns>
         <OutputColumn>Altitude Meters</OutputColumn>
