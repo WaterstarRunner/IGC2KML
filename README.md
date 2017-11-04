@@ -16,6 +16,16 @@ You can specify either a single IGC file, or a directory full of IGC files:
 
 The CSV files will be output in the current working directory
 
+This version will prompt to offset the pressure altitude for each flight by a fixed distance. Follow the prompts to apply a correction to the altitude data.
+
+    Pressure altitude correction for flight date 2017-05-30 at 02:46:38 UTC
+    Pressure altitude (Meters) - Initial: 161, Final 27, Max: 259, Min: 26
+    Would you like to offset the altitude data for this flight [y/N]?y
+    Enter the altitude offset in meters:-25
+    Offsetting altitude by -25 meters
+    
+Starting, finishing, maximum, and minimum pressure altitudes in the IGC file are displayed to assist in estimating an appropriate offset. 
+
 #DashWare
 Another purpose of this program is to put your flight logs in to a format that DashWare can understand, making it possible to create telemetry overlays on your flight videos.
 
@@ -32,3 +42,5 @@ DashWare supports a variety of formats natively, but IGC is not one of them. The
 Copy the IGC2CSV.xml file to your Documents/DashWare/DataProfiles directory.
 
 The DataProfile should automatically detect when you load a compatible CSV in to your DashWare project, but if it does not, you can find it in the list as "IGC2CSV"
+
+This version prioritizes pressure altitude for altitude data in dashware.
