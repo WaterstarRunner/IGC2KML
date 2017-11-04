@@ -59,6 +59,7 @@ def crunch_flight(flight):
       flight['alt_floor'] = min(record['alt-GPS'], flight['alt_floor'])
       flight['pressure_altitude_peak'] = max(record['alt-pressure'], flight['pressure_altitude_peak'])
       flight['pressure_altitude_floor'] = min(record['alt-pressure'], flight['pressure_altitude_floor'])
+      flight['pressure_altitude_finish'] = record['alt-pressure']
       if "TAS" in flight['optional_records']:
         flight['tas_peak'] = max(record['opt_tas'], flight['tas_peak'])
         record['tas_peak'] = flight['tas_peak']
@@ -67,6 +68,7 @@ def crunch_flight(flight):
       flight['datetime_start'] = datetime.datetime.combine(flight['flightdate'], flight['time_start'])
       flight['altitude_start'] = record['alt-GPS']
       flight['pressure_altitude_start'] = record['alt-pressure']
+      flight['pressure_altitude_finish'] = record['alt-pressure']
       flight['distance_total'] = 0
       flight['climb_total'] = 0
       flight['alt_peak'] = record['alt-GPS']
@@ -97,8 +99,21 @@ def crunch_flight(flight):
 
 def fix_flight_pressure_alt(flight):
   #for index, record in enumerate(flight['fixrecords']):
-  print "Pressure altitude correction for flight date {} at {} UTC".format(flight['flightdate'],flight['time_start'])
-  print "Pressure altitude- Initial: {}, Max: {}, Min: {}".format(flight['pressure_altitude_start'],flight['pressure_altitude_peak'],flight['pressure_altitude_floor'])
+  print '\nPressure altitude correction for flight date {} at {} UTC'.format(flight['flightdate'],flight['time_start'])
+  print 'Pressure altitude (Meters) - Initial: {}, Final {}, Max: {}, Min: {}'.format(flight['pressure_altitude_start'],flight['pressure_altitude_finish'],flight['pressure_altitude_peak'],flight['pressure_altitude_floor'])
+  choice = raw_input ('Would you like to offset the altitude data for this flight [y/N]?')
+  if (choice.lower() in ['yes','y']):
+    invalid_offset = True
+    while invalid_offset:
+      offset_string = raw_input ('Enter the altitude offset in meters:')
+      try:
+        offset_integer = int(offset_string)
+        invalid_offset = False
+      except ValueError:
+        invalid_offset = True
+    print 'Offsetting altitude by {} meters'.format(offset_integer)
+    for record in flight['fixrecords']:
+      record['alt-pressure']+=offset_integer
   return flight
 
 def logline_A(line, flight):
@@ -275,23 +290,27 @@ if __name__ == "__main__":
   # Output the CSV file for all flights
   for flight in logbook:
     flight['outputfilename'] = get_output_filename(flight['igcfile'])
+    if os.path.isfile(flight['outputfilename']):
+      print 'Skipping output to file {} because it already exists. Rename or delete the existing file then try again.'.format(flight['outputfilename'])
+    else:
+      output = open(flight['outputfilename'], 'w')
+      outputfields = list(defaultoutputfields)
+      if 'TAS' in flight['optional_records']:
+        outputfields.append( ('True Airspeed', 'record', 'opt_tas') )
+        outputfields.append( ('True Airspeed Peak', 'record', 'tas_peak') )
 
-    output = open(flight['outputfilename'], 'w')
-    outputfields = list(defaultoutputfields)
-    if 'TAS' in flight['optional_records']:
-      outputfields.append( ('True Airspeed', 'record', 'opt_tas') )
-      outputfields.append( ('True Airspeed Peak', 'record', 'tas_peak') )
-
-    header = ''
-    for field in outputfields:
-      header += field[0] + ','
-    output.write(header[:-1] + '\n')
-
-    for record in flight['fixrecords']:
-      recordline = ''
+      header = ''
       for field in outputfields:
-        if field[1] == 'record':
-          recordline += str(record[field[2]]) + ','
-        elif field[1] == 'flight':
-          recordline += str(flight[field[2]]) + ','
-      output.write(recordline[:-1] + '\n')
+        header += field[0] + ','
+      output.write(header[:-1] + '\n')
+
+      for record in flight['fixrecords']:
+        recordline = ''
+        for field in outputfields:
+          if field[1] == 'record':
+            recordline += str(record[field[2]]) + ','
+          elif field[1] == 'flight':
+            recordline += str(flight[field[2]]) + ','
+        output.write(recordline[:-1] + '\n')
+      output.close()
+    print 'Finished.'
