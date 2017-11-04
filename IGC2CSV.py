@@ -57,6 +57,8 @@ def crunch_flight(flight):
       record['climb_total'] = flight['climb_total']
       flight['alt_peak'] = max(record['alt-GPS'], flight['alt_peak'])
       flight['alt_floor'] = min(record['alt-GPS'], flight['alt_floor'])
+      flight['pressure_altitude_peak'] = max(record['alt-pressure'], flight['pressure_altitude_peak'])
+      flight['pressure_altitude_floor'] = min(record['alt-pressure'], flight['pressure_altitude_floor'])
       if "TAS" in flight['optional_records']:
         flight['tas_peak'] = max(record['opt_tas'], flight['tas_peak'])
         record['tas_peak'] = flight['tas_peak']
@@ -64,10 +66,13 @@ def crunch_flight(flight):
       flight['time_start'] = record['time']
       flight['datetime_start'] = datetime.datetime.combine(flight['flightdate'], flight['time_start'])
       flight['altitude_start'] = record['alt-GPS']
+      flight['pressure_altitude_start'] = record['alt-pressure']
       flight['distance_total'] = 0
       flight['climb_total'] = 0
       flight['alt_peak'] = record['alt-GPS']
       flight['alt_floor'] = record['alt-GPS']
+      flight['pressure_altitude_peak'] = record['alt-pressure']
+      flight['pressure_altitude_floor'] = record['alt-pressure']
       flight['groundspeed_peak'] = 0
   
       record['date'] = flight['flightdate']
@@ -88,6 +93,12 @@ def crunch_flight(flight):
         flight['tas_peak'] = record['opt_tas']
         record['tas_peak'] = 0
   
+  return flight
+
+def fix_flight_pressure_alt(flight):
+  #for index, record in enumerate(flight['fixrecords']):
+  print "Pressure altitude correction for flight date {} at {} UTC".format(flight['flightdate'],flight['time_start'])
+  print "Pressure altitude- Initial: {}, Max: {}, Min: {}".format(flight['pressure_altitude_start'],flight['pressure_altitude_peak'],flight['pressure_altitude_floor'])
   return flight
 
 def logline_A(line, flight):
@@ -256,6 +267,10 @@ if __name__ == "__main__":
   # Crunch the telemetry numbers on all of the flights
   for flight in logbook:
     flight = crunch_flight(flight)
+
+  # Fix the altitude data
+  for flight in logbook:
+    flight = fix_flight_pressure_alt(flight)
 
   # Output the CSV file for all flights
   for flight in logbook:
