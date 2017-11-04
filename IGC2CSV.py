@@ -51,7 +51,7 @@ def crunch_flight(flight):
       flight['groundspeed_peak'] = max(record['groundspeed'], flight['groundspeed_peak'])
       record['groundspeed_peak'] = flight['groundspeed_peak']
       record['alt_gps_delta'] = record['alt-GPS'] - prevrecord['alt-GPS']
-      record['alt_pressure_delta'] = record['pressure'] - prevrecord['pressure']
+      record['alt_pressure_delta'] = record['alt-pressure'] - prevrecord['alt-pressure']
       record['climb_speed'] = record['alt_gps_delta'] / record['time_delta']
       flight['climb_total'] += max(0, record['alt_gps_delta'])
       record['climb_total'] = flight['climb_total']
@@ -124,7 +124,7 @@ def logline_B(line, flight):
     'latitude'  : line[7:15],
     'longitude' : line[15:24],
     'AVflag'    : line[24:25] == "A",
-    'pressure'  : int(line[25:30]),
+    'alt-pressure'  : int(line[25:30]),
     'alt-GPS'   : int(line[30:35]),
   })
   for key, record in flight['optional_records'].iteritems():
