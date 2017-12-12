@@ -53,8 +53,11 @@ def crunch_flight(flight):
       record['alt_gps_delta'] = record['alt-GPS'] - prevrecord['alt-GPS']
       record['alt_pressure_delta'] = record['alt-pressure'] - prevrecord['alt-pressure']
       record['climb_speed'] = record['alt_gps_delta'] / record['time_delta']
+      record['pressure_climb_speed'] = record['alt_pressure_delta'] / record['time_delta']
       flight['climb_total'] += max(0, record['alt_gps_delta'])
       record['climb_total'] = flight['climb_total']
+      flight['pressure_climb_total'] += max(0, record['alt_pressure_delta'])
+      record['pressure_climb_total'] = flight['pressure_climb_total']
       flight['alt_peak'] = max(record['alt-GPS'], flight['alt_peak'])
       flight['alt_floor'] = min(record['alt-GPS'], flight['alt_floor'])
       flight['pressure_altitude_peak'] = max(record['alt-pressure'], flight['pressure_altitude_peak'])
@@ -71,6 +74,7 @@ def crunch_flight(flight):
       flight['pressure_altitude_finish'] = record['alt-pressure']
       flight['distance_total'] = 0
       flight['climb_total'] = 0
+      flight['pressure_climb_total'] = 0
       flight['alt_peak'] = record['alt-GPS']
       flight['alt_floor'] = record['alt-GPS']
       flight['pressure_altitude_peak'] = record['alt-pressure']
@@ -88,7 +92,9 @@ def crunch_flight(flight):
       record['alt_gps_delta'] = 0
       record['alt_pressure_delta'] = 0
       record['climb_speed'] = 0
+      record['pressure_climb_speed'] = 0
       record['climb_total'] = 0
+      record['pressure_climb_total'] = 0
       record['distance_from_start'] = 0
 
       if "TAS" in flight['optional_records']:
@@ -248,7 +254,9 @@ if __name__ == "__main__":
     ('Altitude Delta (GPS)', 'record', 'alt_gps_delta'),
     ('Altitude Delta (Pressure)', 'record', 'alt_pressure_delta'),
     ('Climb Speed', 'record', 'climb_speed'),
+    ('Climb Speed (Pressure)', 'record', 'pressure_climb_speed'),
     ('Climb Total', 'record', 'climb_total'),
+    ('Climb Total (Pressure)', 'record', 'pressure_climb_total'),
     ('Max Altitude (flight)', 'flight', 'alt_peak'),
     ('Min Altitude (flight)', 'flight', 'alt_floor'),
     ('Distance From Start (straight line)', 'record', 'distance_from_start')
